@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 2: Knowledge Check</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font (for generic use, but Helvetica is enforced in custom styles) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Configure Brand Colors for Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        // Using Helvetica as the primary font family
+                        sans: ['Helvetica', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-light': '#C6B4D9',
+                        'brand-medium': '#9C7F9D',
+                        'brand-dark': '#513873',
+                        'brand-darker': '#413659',
+                        'brand-bg': '#F2F2F2',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom styles for font and radio/checkbox colors -->
+    <style>
+        body {
+            /* Enforcing Helvetica as the primary font */
+            font-family: 'Helvetica', 'Inter', sans-serif;
+        }
+        /* Style radio buttons and checkboxes with the brand color */
+        input[type="radio"]:checked,
+        input[type="checkbox"]:checked {
+            accent-color: #513873; 
+        }
+        
+        /* Custom focus rings to use brand color */
+        input[type="radio"]:focus,
+        input[type="checkbox"]:focus {
+            outline: 2px solid #513873;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="bg-brand-bg min-h-screen flex items-center justify-center p-4">
+
+    <!-- Quiz Card Container -->
+    <div class="bg-white shadow-2xl rounded-xl p-6 md:p-8 max-w-2xl w-full" id="quiz-container">
+        
+        <!-- Quiz Header -->
+        <div id="quiz-header">
+            <h1 class="text-2xl md:text-3xl font-bold text-brand-darker mb-2">Module 2 Knowledge Check</h1>
+            <p class="text-sm text-gray-600 mb-6" id="question-counter">Question 1 of 4</p>
+        </div>
+
+        <!-- Question Area -->
+        <div id="question-area">
+            <h2 class="text-xl font-semibold text-brand-darker mb-5" id="question-text"></h2>
+            
+            <!-- Options Area -->
+            <div class="space-y-3" id="options-container">
+                <!-- Options will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Feedback Area -->
+        <div class="mt-6">
+            <p id="feedback-text" class="text-center font-semibold text-lg" aria-live="polite"></p>
+        </div>
+
+        <!-- Button Controls -->
+        <div class="mt-6 space-y-3">
+            <button id="check-btn" class="w-full bg-brand-dark text-white py-3 px-5 rounded-lg font-semibold hover:bg-brand-darker transition-colors focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2">
+                Check Answer
+            </button>
+            
+            <!-- The 'Next Question' button has been moved into the modal below -->
+        </div>
+
+    </div>
+
+    <!-- Correct Answer Modal (Pop-out) -->
+    <div id="correct-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden" aria-modal="true" role="dialog">
+        <div class="bg-white rounded-xl p-8 shadow-2xl text-center max-w-sm w-full">
+            <h2 class="text-2xl font-bold text-green-600 mb-6">Correct! Well done</h2>
+            <button id="next-btn" class="w-full bg-white text-brand-dark border-2 border-brand-dark py-2.5 px-5 rounded-lg font-semibold hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2">
+                Next Question
+            </button>
+        </div>
+    </div>
+
+    <!-- Completion Screen: Adjusted to center correctly without disrupting the main flow. -->
+    <div id="completion-screen" class="fixed inset-0 bg-brand-bg flex items-center justify-center p-4 hidden">
+        <div class="bg-white shadow-2xl rounded-xl p-8 md:p-10 max-w-2xl w-full text-center">
+            <h1 class="text-3xl font-bold text-brand-darker mb-4">Quiz Complete!</h1>
+            <p class="text-xl text-gray-700 mb-6">You have successfully completed the Module 2 Knowledge Check.</p>
+            <button id="restart-btn" class="bg-brand-dark text-white py-3 px-6 rounded-lg font-semibold hover:bg-brand-darker transition-colors focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2">
+                Restart Quiz
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 1. DEFINE QUIZ DATA ---
+            const quizData = [
+                // Q1: Single Answer (Radio) - Forms of DFV (REVISED FOR CLARITY)
+                {
+                    question: "Which type of violence involves an abuser stopping someone from having or using money, controlling their bank accounts, or making them financially dependent?",
+                    type: "radio", // Single answer
+                    options: [
+                        { text: "Emotional violence", id: "q1_a" },
+                        { text: "Financial violence", id: "q1_b" },
+                        { text: "Social violence", id: "q1_c" },
+                        { text: "Physical violence", id: "q1_d" }
+                    ],
+                    correct: ["q1_b"]
+                },
+                // Q2: Multiple Answers (Checkbox) - Cycle of Abuse
+                {
+                    question: "Which of these stages are part of the four-stage Cycle of Abuse model? (Choose all that apply)",
+                    type: "checkbox", // Multiple answers
+                    options: [
+                        { text: "Tension Builds", id: "q2_a" },
+                        { text: "Abusive Incident", id: "q2_b" },
+                        { text: "Isolation Stage", id: "q2_c" },
+                        { text: "Honeymoon Phase", id: "q2_d" },
+                        { text: "Calm Stage", id: "q2_e" }
+                    ],
+                    correct: ["q2_a", "q2_b", "q2_d", "q2_e"]
+                },
+                // Q3: Single Answer (Radio) - Smokescreen Tactic (REVISED FOR PLAIN ENGLISH)
+                {
+                    question: "An abuser might use a 'smokescreen' tactic to avoid responsibility. Which tactic involves the abuser claiming they are the real victim, saying they were 'provoked'?",
+                    type: "radio", // Single answer
+                    options: [
+                        { text: "Denial (Saying the abuse didn't happen)", id: "q3_a" },
+                        { text: "Mutualisation (Saying 'We both did it')", id: "q3_b" },
+                        { text: "Victim Stance (Claiming they are the victim)", id: "q3_c" },
+                        { text: "Justification (Saying the abuse was necessary or deserved)", id: "q3_d" }
+                    ],
+                    correct: ["q3_c"]
+                },
+                // Q4: Multiple Answers (Checkbox) - Barriers to Help
+                {
+                    question: "What are some reasons a person might struggle to get help for domestic and family violence? (Choose all that apply)",
+                    type: "checkbox", // Multiple answers
+                    options: [
+                        { text: "They rely on the abuser for money (financial dependency)", id: "q4_a" },
+                        { text: "They fear harm to their children or pets", id: "q4_b" },
+                        { text: "They worry about being judged or feel ashamed", id: "q4_c" },
+                        { text: "There are no community support services available", id: "q4_d" }
+                    ],
+                    correct: ["q4_a", "q4_b", "q4_c"]
+                }
+            ];
+
+            // --- 2. GET ELEMENT REFERENCES ---
+            const quizContainer = document.getElementById('quiz-container');
+            const questionCounter = document.getElementById('question-counter');
+            const questionText = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            const checkBtn = document.getElementById('check-btn');
+            const nextBtn = document.getElementById('next-btn'); // This button is now in the modal
+            const feedbackText = document.getElementById('feedback-text');
+            const correctModal = document.getElementById('correct-modal'); // The new modal
+            const completionScreen = document.getElementById('completion-screen');
+            const restartBtn = document.getElementById('restart-btn');
+
+            // --- 3. STATE VARIABLES ---
+            let currentQuestionIndex = 0;
+            let questionsAnswered = new Array(quizData.length).fill(false);
+
+            // --- 4. FUNCTIONS ---
+
+            /**
+             * Loads a question onto the page
+             * @param {number} index - The index of the question to load
+             */
+            function loadQuestion(index) {
+                const question = quizData[index];
+                
+                // Update text
+                questionCounter.textContent = `Question ${index + 1} of ${quizData.length}`;
+                questionText.textContent = question.question;
+                
+                // Clear old options and feedback
+                optionsContainer.innerHTML = '';
+                feedbackText.textContent = '';
+                feedbackText.className = 'text-center font-semibold text-lg'; // Reset classes
+
+                // Create and append new options
+                question.options.forEach(option => {
+                    const optionId = option.id;
+                    
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'border border-gray-300 rounded-lg transition-all hover:bg-brand-light/20';
+                    
+                    const input = document.createElement('input');
+                    input.type = question.type;
+                    input.id = optionId;
+                    input.name = `question_${index}`;
+                    input.value = optionId;
+                    input.className = 'mr-3 flex-shrink-0'; // Added utility classes
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = optionId;
+                    label.textContent = option.text;
+                    label.className = 'flex items-center p-3 cursor-pointer w-full';
+                    
+                    // Manually build label content to put input first
+                    label.innerHTML = `<input type="${question.type}" id="${optionId}" name="question_${index}" value="${optionId}" class="mr-3 flex-shrink-0">
+                                       <span class="flex-1">${option.text}</span>`;
+                    
+                    wrapper.appendChild(label);
+                    optionsContainer.appendChild(wrapper);
+                });
+
+                // Reset button states
+                checkBtn.classList.remove('hidden');
+            }
+
+            /**
+             * Checks the selected answer(s) for the current question
+             */
+            function checkAnswer() {
+                const question = quizData[currentQuestionIndex];
+                const selectedInputs = optionsContainer.querySelectorAll('input:checked');
+                
+                if (selectedInputs.length === 0) {
+                     feedbackText.textContent = "Please select at least one answer.";
+                     feedbackText.classList.add('text-red-600');
+                     return;
+                }
+
+                let selectedAnswers = [];
+                selectedInputs.forEach(input => {
+                    selectedAnswers.push(input.value);
+                });
+
+                // Sort arrays for consistent comparison
+                const correctAnswers = [...question.correct].sort();
+                selectedAnswers.sort();
+
+                // Check for equality
+                const isCorrect = JSON.stringify(selectedAnswers) === JSON.stringify(correctAnswers);
+
+                if (isCorrect) {
+                    // --- CORRECT ANSWER ---
+                    feedbackText.textContent = '';
+                    feedbackText.className = 'text-center font-semibold text-lg';
+                    
+                    // Show the modal
+                    correctModal.classList.remove('hidden');
+                    
+                    // Hide check button
+                    checkBtn.classList.add('hidden');
+                    
+                    // Mark as answered
+                    questionsAnswered[currentQuestionIndex] = true;
+
+                    // Update next button text for last question
+                    if (currentQuestionIndex === quizData.length - 1) {
+                        nextBtn.textContent = "Finish Quiz";
+                    }
+
+                } else {
+                    // --- INCORRECT ANSWER ---
+                    feedbackText.textContent = "Incorrect, Try Again.";
+                    feedbackText.classList.add('text-red-600');
+                    
+                    // Ensure modal stays hidden
+                    correctModal.classList.add('hidden');
+                }
+            }
+
+            /**
+             * Moves to the next question or shows the completion screen
+             */
+            function nextQuestion() {
+                // Hide the modal first
+                correctModal.classList.add('hidden');
+
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    loadQuestion(currentQuestionIndex);
+                } else {
+                    // Hide main quiz and show completion screen
+                    quizContainer.classList.add('hidden');
+                    completionScreen.classList.remove('hidden');
+                }
+            }
+
+            /**
+             * Resets the quiz to the beginning
+             */
+            function restartQuiz() {
+                currentQuestionIndex = 0;
+                questionsAnswered.fill(false);
+                nextBtn.textContent = "Next Question"; // Reset button text
+                
+                // Ensure all overlay screens are hidden
+                completionScreen.classList.add('hidden');
+                correctModal.classList.add('hidden');
+
+                // Show the main quiz container
+                quizContainer.classList.remove('hidden');
+                
+                // Reload the first question (which also shows checkBtn)
+                loadQuestion(currentQuestionIndex);
+            }
+
+            // --- 5. INITIALIZE & EVENT LISTENERS ---
+            loadQuestion(currentQuestionIndex);
+
+            checkBtn.addEventListener('click', checkAnswer);
+            nextBtn.addEventListener('click', nextQuestion);
+            restartBtn.addEventListener('click', restartQuiz);
+        });
+    </script>
+</body>
+</html>
