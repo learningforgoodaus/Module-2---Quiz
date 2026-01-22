@@ -49,18 +49,19 @@
         
         <div id="quiz-header">
             <h1 class="text-2xl md:text-3xl font-bold text-brand-darker mb-2">Module 2 Knowledge Check</h1>
-            <p class="text-sm text-gray-600 mb-6" id="question-counter">Question 1 of 4</p>
+            <p class="text-sm text-gray-600 mb-6" id="question-counter">Question 1 of 5</p>
         </div>
 
         <div id="question-area">
             <h2 class="text-xl font-semibold text-brand-darker mb-5" id="question-text"></h2>
             
             <div class="space-y-3" id="options-container">
-                </div>
+                <!-- Options populated by JS -->
+            </div>
         </div>
 
         <div class="mt-6">
-            <p id="feedback-text" class="text-center font-semibold text-lg" aria-live="polite"></p>
+            <p id="feedback-text" class="text-center font-semibold text-lg min-h-[1.75rem]" aria-live="polite"></p>
         </div>
 
         <div class="mt-6 space-y-3">
@@ -71,8 +72,16 @@
 
     </div>
 
+    <!-- Correct Modal -->
     <div id="correct-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden" aria-modal="true" role="dialog">
         <div class="bg-white rounded-xl p-8 shadow-2xl text-center max-w-sm w-full">
+            <div class="flex justify-center mb-4">
+                <div class="bg-green-100 p-3 rounded-full">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+            </div>
             <h2 class="text-2xl font-bold text-green-600 mb-6">Correct! Well done</h2>
             <button id="next-btn" class="w-full bg-white text-brand-dark border-2 border-brand-dark py-2.5 px-5 rounded-lg font-semibold hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2">
                 Next Question
@@ -80,8 +89,16 @@
         </div>
     </div>
 
+    <!-- Completion Screen -->
     <div id="completion-screen" class="fixed inset-0 bg-brand-bg flex items-center justify-center p-4 hidden">
         <div class="bg-white shadow-2xl rounded-xl p-8 md:p-10 max-w-2xl w-full text-center">
+            <div class="flex justify-center mb-6">
+                <div class="bg-brand-light/30 p-5 rounded-full">
+                    <svg class="w-12 h-12 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
             <h1 class="text-3xl font-bold text-brand-darker mb-4">Quiz Complete!</h1>
             <p class="text-xl text-gray-700">You have successfully completed the Module 2 Knowledge Check.</p>
         </div>
@@ -90,56 +107,65 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // --- 1. DEFINE QUIZ DATA ---
+            // --- 1. DEFINE UPDATED QUIZ DATA ---
             const quizData = [
-                // Q1: Single Answer (Radio)
                 {
-                    question: "Which type of violence or abuse involves a perpetrator stopping someone from having or using money, controlling their bank accounts, or making them financially dependent?",
+                    // Question 1
+                    question: "Which of the following best describes domestic and family violence?",
                     type: "radio", 
                     options: [
-                        { text: "Emotional violence", id: "q1_a" },
-                        { text: "Financial violence", id: "q1_b" },
-                        { text: "Social violence", id: "q1_c" },
-                        { text: "Physical violence", id: "q1_d" }
+                        { text: "Only physical harm between partners", id: "q1_a" },
+                        { text: "Any behavior that is threatening, abusive, violent, coercive, or controlling, causing fear or loss of freedom", id: "q1_b" },
+                        { text: "Arguments that happen in relationships", id: "q1_c" },
+                        { text: "Only financial abuse", id: "q1_d" }
                     ],
                     correct: ["q1_b"]
                 },
-                // Q2: Multiple Answers (Checkbox)
                 {
-                    question: "Which of these stages are part of the four-stage Cycle of Abuse model? (Choose all that apply)",
+                    // Question 2
+                    question: "Which of the following are key drivers of domestic and family violence? (Select all that apply)",
                     type: "checkbox", 
                     options: [
-                        { text: "Tension Builds", id: "q2_a" },
-                        { text: "Abusive Incident", id: "q2_b" },
-                        { text: "Isolation Stage", id: "q2_c" },
-                        { text: "Honeymoon Phase", id: "q2_d" },
-                        { text: "Calm Stage", id: "q2_e" }
+                        { text: "Gender inequality and rigid gender roles", id: "q2_a" },
+                        { text: "Social norms that condone violence", id: "q2_b" },
+                        { text: "Structural and cultural discrimination", id: "q2_c" },
+                        { text: "Stress from work", id: "q2_d" }
                     ],
-                    correct: ["q2_a", "q2_b", "q2_d", "q2_e"]
+                    correct: ["q2_a", "q2_b", "q2_c"]
                 },
-                // Q3: Single Answer (Radio)
                 {
-                    question: "An abuser might use a 'smokescreen' tactic to avoid responsibility. Which tactic involves the abuser claiming they are the real victim, saying they were 'provoked'?",
+                    // Question 3 (Based on your provided item #4)
+                    question: "Domestic and family violence only happens in certain communities.",
                     type: "radio", 
                     options: [
-                        { text: "Denial (Saying the abuse didn't happen)", id: "q3_a" },
-                        { text: "Mutualisation (Saying 'We both did it')", id: "q3_b" },
-                        { text: "Victim Stance (Claiming they are the victim)", id: "q3_c" },
-                        { text: "Justification (Saying the abuse was necessary or deserved)", id: "q3_d" }
+                        { text: "True", id: "q3_a" },
+                        { text: "False", id: "q3_b" }
                     ],
-                    correct: ["q3_c"]
+                    correct: ["q3_b"]
                 },
-                // Q4: Multiple Answers (Checkbox)
                 {
-                    question: "What are some reasons a person might struggle to get help for domestic and family violence? (Choose all that apply)",
+                    // Question 4 (Based on your provided item #5)
+                    question: "Which of the following are myths about DFV? (Select all that apply)",
                     type: "checkbox", 
                     options: [
-                        { text: "They rely on the abuser for money (financial dependency)", id: "q4_a" },
-                        { text: "They fear harm to their children or pets", id: "q4_b" },
-                        { text: "They worry about being judged or feel ashamed", id: "q4_c" },
-                        { text: "There are no community support services available", id: "q4_d" }
+                        { text: "DFV only happens in certain types of families", id: "q4_a" },
+                        { text: "Victim-survivors often face barriers to seeking help", id: "q4_b" },
+                        { text: "DFV is complex and can involve multiple forms of abuse", id: "q4_c" },
+                        { text: "Coercive control is not serious", id: "q4_d" }
                     ],
-                    correct: ["q4_a", "q4_b", "q4_c"]
+                    correct: ["q4_a", "q4_d"]
+                },
+                {
+                    // Question 5 (Based on your provided item #6)
+                    question: "Which stages are part of the cycle of violence? (Select all that apply)",
+                    type: "checkbox", 
+                    options: [
+                        { text: "Tension building", id: "q5_a" },
+                        { text: "Incident", id: "q5_b" },
+                        { text: "Reconciliation", id: "q5_c" },
+                        { text: "Calm", id: "q5_d" }
+                    ],
+                    correct: ["q5_a", "q5_b", "q5_c", "q5_d"]
                 }
             ];
 
@@ -156,43 +182,37 @@
 
             // --- 3. STATE VARIABLES ---
             let currentQuestionIndex = 0;
-            let questionsAnswered = new Array(quizData.length).fill(false);
 
             // --- 4. FUNCTIONS ---
 
             function loadQuestion(index) {
                 const question = quizData[index];
                 
-                // Update text
+                // Update header text
                 questionCounter.textContent = `Question ${index + 1} of ${quizData.length}`;
                 questionText.textContent = question.question;
                 
                 // Clear old options and feedback
                 optionsContainer.innerHTML = '';
                 feedbackText.textContent = '';
-                feedbackText.className = 'text-center font-semibold text-lg'; 
+                feedbackText.className = 'text-center font-semibold text-lg min-h-[1.75rem]'; 
 
                 // Create and append new options
                 question.options.forEach(option => {
                     const optionId = option.id;
                     
                     const wrapper = document.createElement('div');
-                    wrapper.className = 'border border-#F6F5F8-300 rounded-lg transition-all hover:bg-brand-light/20';
-                    
-                    const input = document.createElement('input');
-                    input.type = question.type;
-                    input.id = optionId;
-                    input.name = `question_${index}`;
-                    input.value = optionId;
-                    input.className = 'mr-3 flex-shrink-0'; 
+                    wrapper.className = 'border border-gray-200 rounded-lg transition-all hover:bg-brand-light/10';
                     
                     const label = document.createElement('label');
                     label.htmlFor = optionId;
-                    label.textContent = option.text;
-                    label.className = 'flex items-center p-3 cursor-pointer w-full';
+                    label.className = 'flex items-center p-4 cursor-pointer w-full';
                     
-                    label.innerHTML = `<input type="${question.type}" id="${optionId}" name="question_${index}" value="${optionId}" class="mr-3 flex-shrink-0">
-                                       <span class="flex-1">${option.text}</span>`;
+                    // Construct input inside label for easier clicking
+                    label.innerHTML = `
+                        <input type="${question.type}" id="${optionId}" name="question_${index}" value="${optionId}" class="w-5 h-5 mr-4 flex-shrink-0 accent-brand-dark">
+                        <span class="text-gray-800 leading-tight">${option.text}</span>
+                    `;
                     
                     wrapper.appendChild(label);
                     optionsContainer.appendChild(wrapper);
@@ -207,7 +227,7 @@
                 const selectedInputs = optionsContainer.querySelectorAll('input:checked');
                 
                 if (selectedInputs.length === 0) {
-                     feedbackText.textContent = "Please select at least one answer.";
+                     feedbackText.textContent = "Please select an answer.";
                      feedbackText.classList.add('text-red-600');
                      return;
                 }
@@ -223,41 +243,35 @@
                 const isCorrect = JSON.stringify(selectedAnswers) === JSON.stringify(correctAnswers);
 
                 if (isCorrect) {
-                    // --- CORRECT ANSWER ---
+                    // CORRECT ANSWER
                     feedbackText.textContent = '';
-                    feedbackText.className = 'text-center font-semibold text-lg';
                     
                     // Show the modal
                     correctModal.classList.remove('hidden');
-                    
-                    // Hide check button
                     checkBtn.classList.add('hidden');
                     
-                    // Mark as answered
-                    questionsAnswered[currentQuestionIndex] = true;
-
                     // Update next button text for last question
                     if (currentQuestionIndex === quizData.length - 1) {
                         nextBtn.textContent = "Finish Quiz";
+                    } else {
+                        nextBtn.textContent = "Next Question";
                     }
 
                 } else {
-                    // --- INCORRECT ANSWER ---
-                    feedbackText.textContent = "Incorrect, Try Again.";
+                    // INCORRECT ANSWER
+                    feedbackText.textContent = "Incorrect. Please try again.";
+                    feedbackText.classList.remove('text-green-600');
                     feedbackText.classList.add('text-red-600');
-                    correctModal.classList.add('hidden');
                 }
             }
 
             function nextQuestion() {
-                // Hide the modal first
                 correctModal.classList.add('hidden');
 
                 currentQuestionIndex++;
                 if (currentQuestionIndex < quizData.length) {
                     loadQuestion(currentQuestionIndex);
                 } else {
-                    // Hide main quiz and show completion screen
                     quizContainer.classList.add('hidden');
                     completionScreen.classList.remove('hidden');
                 }
@@ -272,5 +286,3 @@
     </script>
 </body>
 </html>
-
-
