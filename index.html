@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Module 2: Knowledge Check</title>
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Configure Brand Colors for Tailwind -->
     <script>
         tailwind.config = {
             theme: {
@@ -32,58 +35,74 @@
         body {
             font-family: 'Helvetica', 'Inter', sans-serif;
         }
+        /* Style radio buttons and checkboxes with the brand color */
         input[type="radio"]:checked,
         input[type="checkbox"]:checked {
             accent-color: #513873; 
         }
+        
+        /* Custom focus rings to use brand color */
         input[type="radio"]:focus,
         input[type="checkbox"]:focus {
             outline: 2px solid #513873;
             outline-offset: 2px;
         }
+
+        .option-wrapper {
+            transition: all 0.2s ease;
+        }
+        
+        .option-wrapper:hover {
+            border-color: #9C7F9D;
+            background-color: rgba(198, 180, 217, 0.1);
+        }
     </style>
 </head>
 <body class="bg-brand-bg min-h-screen flex items-center justify-center p-4">
 
+    <!-- Quiz Card Container -->
     <div class="bg-white shadow-2xl rounded-xl p-6 md:p-8 max-w-2xl w-full" id="quiz-container">
         
+        <!-- Quiz Header -->
         <div id="quiz-header">
             <h1 class="text-2xl md:text-3xl font-bold text-brand-darker mb-2">Module 2 Knowledge Check</h1>
             <p class="text-sm text-gray-600 mb-6" id="question-counter">Question 1 of 5</p>
         </div>
 
+        <!-- Question Area -->
         <div id="question-area">
             <h2 class="text-xl font-semibold text-brand-darker mb-5" id="question-text"></h2>
             
+            <!-- Options Area -->
             <div class="space-y-3" id="options-container">
-                <!-- Options populated by JS -->
+                <!-- Options will be dynamically inserted here -->
             </div>
         </div>
 
-        <div class="mt-6">
-            <p id="feedback-text" class="text-center font-semibold text-lg min-h-[1.75rem]" aria-live="polite"></p>
+        <!-- Feedback Area -->
+        <div class="mt-6 min-h-[2rem]">
+            <p id="feedback-text" class="text-center font-semibold text-lg" aria-live="polite"></p>
         </div>
 
-        <div class="mt-6 space-y-3">
+        <!-- Button Controls -->
+        <div class="mt-4 space-y-3">
             <button id="check-btn" class="w-full bg-brand-dark text-white py-3 px-5 rounded-lg font-semibold hover:bg-brand-darker transition-colors focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2">
                 Check Answer
             </button>
         </div>
-
     </div>
 
-    <!-- Correct Modal -->
-    <div id="correct-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden" aria-modal="true" role="dialog">
-        <div class="bg-white rounded-xl p-8 shadow-2xl text-center max-w-sm w-full">
-            <div class="flex justify-center mb-4">
-                <div class="bg-green-100 p-3 rounded-full">
-                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                </div>
+    <!-- Correct Answer Modal (Pop-out) -->
+    <div id="correct-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50" aria-modal="true" role="dialog">
+        <div class="bg-white rounded-xl p-8 shadow-2xl text-center max-w-sm w-full transform transition-all">
+            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
             </div>
-            <h2 class="text-2xl font-bold text-green-600 mb-6">Correct! Well done</h2>
-            <button id="next-btn" class="w-full bg-white text-brand-dark border-2 border-brand-dark py-2.5 px-5 rounded-lg font-semibold hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Correct! Well done</h2>
+            <p class="text-gray-600 mb-6">You've correctly identified the answer.</p>
+            <button id="next-btn" class="w-full bg-white text-brand-dark border-2 border-brand-dark py-3 px-5 rounded-lg font-semibold hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2">
                 Next Question
             </button>
         </div>
@@ -104,13 +123,13 @@
         </div>
     </div>
 
+    <!-- JavaScript Logic -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // --- 1. DEFINE UPDATED QUIZ DATA ---
+            // --- 1. DEFINE QUIZ DATA ---
             const quizData = [
                 {
-                    // Question 1
                     question: "Which of the following best describes domestic and family violence?",
                     type: "radio", 
                     options: [
@@ -122,7 +141,6 @@
                     correct: ["q1_b"]
                 },
                 {
-                    // Question 2
                     question: "Which of the following are key drivers of domestic and family violence? (Select all that apply)",
                     type: "checkbox", 
                     options: [
@@ -134,7 +152,6 @@
                     correct: ["q2_a", "q2_b", "q2_c"]
                 },
                 {
-                    // Question 3 (Based on your provided item #4)
                     question: "Domestic and family violence only happens in certain communities.",
                     type: "radio", 
                     options: [
@@ -144,7 +161,6 @@
                     correct: ["q3_b"]
                 },
                 {
-                    // Question 4 (Based on your provided item #5)
                     question: "Which of the following are myths about DFV? (Select all that apply)",
                     type: "checkbox", 
                     options: [
@@ -156,7 +172,6 @@
                     correct: ["q4_a", "q4_d"]
                 },
                 {
-                    // Question 5 (Based on your provided item #6)
                     question: "Which stages are part of the cycle of violence? (Select all that apply)",
                     type: "checkbox", 
                     options: [
@@ -188,38 +203,36 @@
             function loadQuestion(index) {
                 const question = quizData[index];
                 
-                // Update header text
+                // Update text
                 questionCounter.textContent = `Question ${index + 1} of ${quizData.length}`;
                 questionText.textContent = question.question;
                 
                 // Clear old options and feedback
                 optionsContainer.innerHTML = '';
                 feedbackText.textContent = '';
-                feedbackText.className = 'text-center font-semibold text-lg min-h-[1.75rem]'; 
+                feedbackText.className = 'text-center font-semibold text-lg';
 
                 // Create and append new options
                 question.options.forEach(option => {
-                    const optionId = option.id;
-                    
                     const wrapper = document.createElement('div');
-                    wrapper.className = 'border border-gray-200 rounded-lg transition-all hover:bg-brand-light/10';
+                    wrapper.className = 'option-wrapper border border-gray-200 rounded-lg transition-all hover:bg-brand-light/10';
                     
                     const label = document.createElement('label');
-                    label.htmlFor = optionId;
-                    label.className = 'flex items-center p-4 cursor-pointer w-full';
+                    label.htmlFor = option.id;
+                    label.className = 'flex items-start p-4 cursor-pointer w-full';
                     
-                    // Construct input inside label for easier clicking
                     label.innerHTML = `
-                        <input type="${question.type}" id="${optionId}" name="question_${index}" value="${optionId}" class="w-5 h-5 mr-4 flex-shrink-0 accent-brand-dark">
-                        <span class="text-gray-800 leading-tight">${option.text}</span>
+                        <input type="${question.type}" id="${option.id}" name="question_${index}" value="${option.id}" class="mt-1 mr-4 flex-shrink-0 scale-125 accent-brand-dark">
+                        <span class="flex-1 text-gray-800 leading-tight font-medium">${option.text}</span>
                     `;
                     
                     wrapper.appendChild(label);
                     optionsContainer.appendChild(wrapper);
                 });
 
-                // Reset button states
+                // Show check button
                 checkBtn.classList.remove('hidden');
+                nextBtn.textContent = (currentQuestionIndex === quizData.length - 1) ? "Finish Quiz" : "Next Question";
             }
 
             function checkAnswer() {
@@ -227,48 +240,33 @@
                 const selectedInputs = optionsContainer.querySelectorAll('input:checked');
                 
                 if (selectedInputs.length === 0) {
-                     feedbackText.textContent = "Please select an answer.";
-                     feedbackText.classList.add('text-red-600');
-                     return;
+                    feedbackText.textContent = "Please select an answer.";
+                    feedbackText.className = 'text-center font-semibold text-lg text-red-600';
+                    return;
                 }
 
-                let selectedAnswers = [];
-                selectedInputs.forEach(input => {
-                    selectedAnswers.push(input.value);
-                });
+                let selectedAnswers = Array.from(selectedInputs).map(input => input.value);
 
+                // Sort for comparison
                 const correctAnswers = [...question.correct].sort();
                 selectedAnswers.sort();
 
                 const isCorrect = JSON.stringify(selectedAnswers) === JSON.stringify(correctAnswers);
 
                 if (isCorrect) {
-                    // CORRECT ANSWER
                     feedbackText.textContent = '';
-                    
-                    // Show the modal
                     correctModal.classList.remove('hidden');
                     checkBtn.classList.add('hidden');
-                    
-                    // Update next button text for last question
-                    if (currentQuestionIndex === quizData.length - 1) {
-                        nextBtn.textContent = "Finish Quiz";
-                    } else {
-                        nextBtn.textContent = "Next Question";
-                    }
-
                 } else {
-                    // INCORRECT ANSWER
                     feedbackText.textContent = "Incorrect. Please try again.";
-                    feedbackText.classList.remove('text-green-600');
-                    feedbackText.classList.add('text-red-600');
+                    feedbackText.className = 'text-center font-semibold text-lg text-red-600';
                 }
             }
 
             function nextQuestion() {
                 correctModal.classList.add('hidden');
-
                 currentQuestionIndex++;
+                
                 if (currentQuestionIndex < quizData.length) {
                     loadQuestion(currentQuestionIndex);
                 } else {
